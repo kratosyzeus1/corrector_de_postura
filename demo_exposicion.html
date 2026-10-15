@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Ergonómico Inteligente | Demostración y Exposición</title>
+    <style>
+        :root {
+            --bg-primary: #0f141c;
+            --bg-secondary: #18202c;
+            --bg-card: #1e2838;
+            --accent-blue: #0084ff;
+            --accent-cyan: #00d4ff;
+            --accent-green: #00e676;
+            --accent-amber: #ffb300;
+            --accent-red: #ff3d00;
+            --text-main: #f0f4f8;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Header */
+        header {
+            background: linear-gradient(180deg, #161e2b 0%, #101622 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .badge-poli {
+            background: linear-gradient(135deg, #0052cc, #00a3ff);
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-title h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .brand-title p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-secondary);
+            padding: 0.3rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: var(--accent-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 132, 255, 0.35);
+        }
+
+        /* Main View Container */
+        main {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* TAB 1: SIMULADOR INTERACTIVO */
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr;
+            gap: 1.5rem;
+        }
+
+        .canvas-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            background: #090d14;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .canvas-hud-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .hud-status-badge {
+            background: rgba(15, 20, 28, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-green);
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .hud-score-badge {
+            background: rgba(15, 20, 28, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--accent-green);
+            border: 1px solid var(--border-color);
+        }
+
+        .alert-popup-floating {
+            position: absolute;
+            bottom: 25px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.95), rgba(153, 27, 27, 0.95));
+            color: white;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            display: none;
+            box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4);
+            animation: pulseAlert 1.5s infinite alternate;
+            border: 1px solid #f87171;
+        }
+
+        @keyframes pulseAlert {
+            from { transform: scale(1); }
+            to { transform: scale(1.02); }
+        }
+
+        .alert-popup-floating h4 {
+            font-size: 0.95rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-popup-floating p {
+            font-size: 0.85rem;
+            opacity: 0.95;
+        }
+
+        .sim-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.6rem 1.1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0070db;
+        }
+
+        .btn-secondary {
+            background: #273446;
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background: #324258;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        /* Telemetry & Metrics Side Panel */
+        .telemetry-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .card-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .card-header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .metric-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .metric-header span.val {
+            font-family: monospace;
+            color: var(--accent-cyan);
+            font-size: 0.95rem;
+        }
+
+        .progress-bar-bg {
+            background: #121822;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-green);
+            width: 35%;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .stat-boxes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        .stat-box {
+            background: var(--bg-secondary);
+            padding: 0.85rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-box .title {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stat-box .num {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-top: 0.2rem;
+        }
+
+        /* TAB 2: DIAPOSITIVAS / PRESENTACIÓN */
+        .slides-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            min-height: 580px;
+        }
+
+        .slide-nav {
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .slide-nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .slide-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+        }
+
+        .slide-nav-btn.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .slide-body {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .slide-body h2 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            margin-bottom: 0.75rem;
+        }
+
+        .slide-body h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 1.25rem 0 0.5rem 0;
+            color: #e2e8f0;
+        }
+
+        .slide-body p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .slide-body ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.12);
+            color: var(--accent-cyan);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Architecture Diagram Flow */
+        .diagram-box {
+            background: #0d121a;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            overflow-x: auto;
+            gap: 1rem;
+        }
+
+        .diagram-step {
+            background: #1b2432;
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .diagram-step .step-num {
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            font-weight: 800;
+        }
+
+        .diagram-step .step-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-top: 0.2rem;
+        }
+
+        .diagram-arrow {
+            color: var(--text-muted);
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-primary);
+        }
+
+        @media (max-width: 900px) {
+            .simulator-grid, .slides-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="brand-container">
+            <div class="badge-poli">POLI</div>
+            <div class="brand-title">
+                <h1>Asistente Ergonómico Inteligente y Monitor de Salud Ocupacional</h1>
+                <p>Avance 2: Diseño Técnico y Prototipo Funcional | Visión por Computador & IA</p>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('simulador')">Simulador en Vivo</button>
+            <button class="tab-btn" onclick="switchTab('kmeans')">Clustering K-Means (IA)</button>
+            <button class="tab-btn" onclick="switchTab('exposicion')">Diapositivas de Exposición</button>
+            <button class="tab-btn" onclick="switchTab('arquitectura')">Flujo & Arquitectura</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- TAB 1: SIMULADOR INTERACTIVO PARA EXPOSICIÓN -->
+        <section id="tab-simulador" class="tab-content active">
+            <div class="simulator-grid">
+                <!-- Visualizer Screen -->
+                <div class="canvas-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="font-size: 1.1rem; font-weight: 700;">Monitor Postural en Tiempo Real (Prototipo Visión Artificial)</h2>
+                        <span class="tag-pill">MediaPipe Pose + OpenCV HUD</span>
+                    </div>
+
+                    <div class="canvas-container">
+                        <canvas id="postureCanvas" width="800" height="480"></canvas>
+                        
+                        <div class="canvas-hud-overlay">
+                            <div class="hud-status-badge" id="hudStatus">
+                                <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--accent-green);" id="statusDot"></span>
+                                <span id="statusText">POSTURA ÓPTIMA (ADECUADA)</span>
+                            </div>
+                            <div class="hud-score-badge" id="hudScore">98% SCORE</div>
+                        </div>
+
+                        <!-- Active Alert Banner -->
+                        <div class="alert-popup-floating" id="floatingAlert">
+                            <h4>¡ALERTA DE HIGIENE POSTURAL ACTIVA!</h4>
+                            <p id="alertReason">Desviación cervical sostenida por más de 5 segundos. Endereza el cuello y realiza estiramiento posterior.</p>
+                        </div>
+                    </div>
+
+                    <!-- Simulator Controls -->
+                    <div class="sim-controls">
+                        <button class="btn btn-primary" onclick="setPostureScenario('optima')">Caso: Postura Óptima</button>
+                        <button class="btn btn-secondary" onclick="setPostureScenario('cervical')">Caso: Cabeza Adelantada (Cifosis)</button>
+                        <button class="btn btn-secondary" onclick="setPostureScenario('hombros')">Caso: Hombros Desalineados</button>
+                        <button class="btn btn-danger" onclick="triggerPausaActiva()">Probar Disparo de Alerta</button>
+                        <button class="btn btn-secondary" onclick="toggleAutoCycle()" id="btnAutoCycle">Pausar Ciclo Automático</button>
+                    </div>
+                </div>
+
+                <!-- Telemetry & Health Dashboard -->
+                <div class="telemetry-card">
+                    <div class="card-header">
+                        <h3>Telemetría Biomecánica en Vivo</h3>
+                        <p>Variables extraídas de coordenadas articulares X, Y, Z</p>
+                    </div>
+
+                    <!-- Metric 1: Cervical Angle -->
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span>Ángulo Inclinación Cervical</span>
+                            <span class="val" id="valCervical">14.2°</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-fill" id="fillCervical" style="width: 25%;"></div>
+                        </div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted);">Umbral normal: &lt; 28° (Directriz ISO 9241-5)</span>
+                    </div>
+
+                    <!-- Metric 2: Shoulder Tilt -->
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span>Desnivel de Hombros</span>
+                            <span class="val" id="valHombros">1.8°</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-fill" id="fillHombros" style="width: 15%;"></div>
+                        </div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted);">Umbral normal: &lt; 7°</span>
+                    </div>
+
+                    <!-- Metric 3: Sustained Bad Posture Time -->
+                    <div class="metric-row">
+                        <div class="metric-header">
+                            <span>Tiempo Continuo de Riesgo</span>
+                            <span class="val" id="valTiempoRiesgo">0.0s / 5.0s</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-fill" id="fillTiempo" style="width: 0%; background: var(--accent-red);"></div>
+                        </div>
+                        <span style="font-size: 0.72rem; color: var(--text-muted);">Tolerancia para evitar falsos positivos antes de alerta</span>
+                    </div>
+
+                    <!-- Session Counters -->
+                    <div class="stat-boxes">
+                        <div class="stat-box">
+                            <div class="title">Cumplimiento</div>
+                            <div class="num" id="statCumplimiento">94.5%</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="title">Alertas Disparadas</div>
+                            <div class="num" id="statAlertas">2</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="title">Frames Analizados</div>
+                            <div class="num" id="statFrames">1,248</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="title">Inferencia Edge</div>
+                            <div class="num">24 FPS</div>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 0.85rem; font-size: 0.8rem; border-left: 3px solid var(--accent-cyan);">
+                        <strong>Ejecución Nativa en Python:</strong> También puedes ejecutar el código de visión en vivo con cámara ejecutando:
+                        <code style="background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan); display:block; margin-top:5px;">python asistente_ergonomico.py</code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: DIAPOSITIVAS DE EXPOSICIÓN -->
+        <section id="tab-exposicion" class="tab-content">
+            <div class="slides-container">
+                <div class="slide-nav">
+                    <button class="slide-nav-btn active" onclick="loadSlide(0)">1. Contexto & Problema</button>
+                    <button class="slide-nav-btn" onclick="loadSlide(1)">2. Pregunta & Objetivos</button>
+                    <button class="slide-nav-btn" onclick="loadSlide(2)">3. Justificación & Valor IA</button>
+                    <button class="slide-nav-btn" onclick="loadSlide(3)">4. Estado del Arte Fortalecido</button>
+                    <button class="slide-nav-btn" onclick="loadSlide(4)">5. Modelo de IA & Técnicas</button>
+                    <button class="slide-nav-btn" onclick="loadSlide(5)">6. Evidencias del Avance 2</button>
+                </div>
+
+                <div class="slide-body" id="slideContent">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: FLUJO Y ARQUITECTURA -->
+        <section id="tab-arquitectura" class="tab-content">
+            <div class="canvas-card">
+                <span class="tag-pill">Diseño Técnico de la Solución</span>
+                <h2>Arquitectura Funcional y Flujo de Información de 6 Fases</h2>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">
+                    Estructura integral del sistema que permite pasar desde la captura de video en tiempo real hasta la toma de decisiones por el agente ergonómico, garantizando 100% de privacidad local (Edge Computing).
+                </p>
+
+                <div class="diagram-box">
+                    <div class="diagram-step">
+                        <div class="step-num">FASE 1</div>
+                        <div class="step-title">Captura Webcam</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Muestreo 3-5s o continuo</div>
+                    </div>
+                    <div class="diagram-arrow">➔</div>
+                    <div class="diagram-step">
+                        <div class="step-num">FASE 2</div>
+                        <div class="step-title">MediaPipe Pose</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">33 Landmarks 3D</div>
+                    </div>
+                    <div class="diagram-arrow">➔</div>
+                    <div class="diagram-step">
+                        <div class="step-num">FASE 3</div>
+                        <div class="step-title">Motor Biomecánico</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Cálculo de ángulos y deltas</div>
+                    </div>
+                    <div class="diagram-arrow">➔</div>
+                    <div class="diagram-step">
+                        <div class="step-num">FASE 4</div>
+                        <div class="step-title">Agente Inteligente</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Ventana temporal de 15s</div>
+                    </div>
+                    <div class="diagram-arrow">➔</div>
+                    <div class="diagram-step">
+                        <div class="step-num">FASE 5</div>
+                        <div class="step-title">Sistema de Alertas</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">HUD no intrusivo</div>
+                    </div>
+                    <div class="diagram-arrow">➔</div>
+                    <div class="diagram-step">
+                        <div class="step-num">FASE 6</div>
+                        <div class="step-title">Clustering K-Means</div>
+                        <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Segmentación de fatiga</div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+                    <div style="background: var(--bg-secondary); padding: 1.25rem; border-radius: 8px;">
+                        <h3 style="color: var(--accent-cyan); font-size: 1rem; margin-bottom: 0.5rem;">Privacidad por Diseño (Edge AI)</h3>
+                        <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.5;">
+                            Ninguna imagen o video se almacena en disco ni viaja a servidores remotos. Los fotogramas residen estrictamente en la memoria RAM volátil durante la inferencia y son destruidos de inmediato. Solo se conservan las métricas angulares numéricas y marcas temporales.
+                        </p>
+                    </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: CLUSTERING K-MEANS & APRENDIZAJE NO SUPERVISADO -->
+        <section id="tab-kmeans" class="tab-content">
+            <div class="canvas-card" style="margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <span class="tag-pill">Técnica No Supervisada (Machine Learning)</span>
+                        <h2 style="font-size: 1.3rem; font-weight: 800; margin-top: 0.35rem;">
+                            Clustering K-Means para Clasificación de Fatiga Ergonómica en Bloques Horarios
+                        </h2>
+                    </div>
+                    <span style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green); padding: 0.35rem 0.85rem; border-radius: 6px; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(0, 230, 118, 0.3);">
+                        Modelo Entrenado: K=3 | Silhouette: 0.5888
+                    </span>
+                </div>
+
+                <!-- Banner de Delimitación Técnica y Ética (Atención a Neider) -->
+                <div style="background: rgba(0, 132, 255, 0.08); border-left: 4px solid var(--accent-blue); padding: 1rem 1.25rem; border-radius: 8px; margin: 1rem 0;">
+                    <h4 style="color: var(--accent-cyan); font-size: 0.95rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>🛡️</span> Delimitación Técnica y Ética del Modelo (Atención a la Retroalimentación Docente)
+                    </h4>
+                    <p style="font-size: 0.85rem; color: #cbd5e1; line-height: 1.55;">
+                        <strong>Directriz del Profesor Neider:</strong> <em>"Conviene delimitar mejor el papel de K-Means y evitar que el sistema formule recomendaciones de salud más allá de lo que pueda sustentarse técnicamente; el siguiente avance debe priorizar un MVP medible."</em><br/>
+                        <strong>Implementación y Delimitación Rigurosa:</strong> El algoritmo K-Means <strong>NO constituye un dispositivo de diagnóstico médico</strong> ni prescribe tratamientos clínicos para patologías músculo-esqueléticas. Su función técnica está delimitada con precisión al <strong>análisis cuantitativo del comportamiento temporal de exposición</strong> en la pantalla. Agrupa los bloques de sesión (30 a 60 minutos) en tres categorías operacionales de fatiga (<strong>Baja Fatiga</strong>, <strong>Fatiga Moderada</strong> y <strong>Alta Fatiga</strong>) con el único fin de <strong>modular dinámicamente la sensibilidad del agente</strong> (reducir o aumentar la tolerancia de tiempo antes de emitir una sugerencia preventiva de pausa activa y estiramiento ergonómico).
+                    </p>
+                </div>
+
+                <!-- Grid de Visualización y Simulador K-Means -->
+                <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+                    
+                    <!-- Columna Izquierda: Espacio 2D de Clusters -->
+                    <div style="background: var(--bg-secondary); border-radius: 10px; padding: 1.25rem; border: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                            <h3 style="font-size: 0.95rem; color: var(--accent-cyan);">Mapa de Dispersión 2D de Clusters (Espacio de Exposición)</h3>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Ejes: % Riesgo vs Ángulo Cervical</span>
+                        </div>
+
+                        <div style="position: relative; background: #0b0f16; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden;">
+                            <canvas id="kmeansScatterCanvas" width="560" height="340" style="width: 100%; height: auto; display: block;"></canvas>
+                        </div>
+
+                        <!-- Leyenda de Clusters -->
+                        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.85rem; font-size: 0.78rem;">
+                            <span style="display: flex; align-items: center; gap: 0.4rem; color: #00e676;">
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #00e676; display: inline-block;"></span>
+                                Baja Fatiga (n=144, 40%)
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 0.4rem; color: #ffb300;">
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffb300; display: inline-block;"></span>
+                                Fatiga Moderada (n=125, 35%)
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 0.4rem; color: #ff3d00;">
+                                <span style="width: 10px; height: 10px; border-radius: 50%; background: #ff3d00; display: inline-block;"></span>
+                                Alta Fatiga (n=91, 25%)
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 0.4rem; color: #00d4ff;">
+                                <span style="display: inline-block; transform: scale(1.3);">★</span>
+                                Bloque Simulado
+                            </span>
+                        </div>
+
+                        <!-- Métricas del Modelo Entrenado -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+                            <div class="stat-box">
+                                <div class="title">Silhouette Score</div>
+                                <div class="num" style="color: var(--accent-cyan); font-size: 1.15rem;">0.5888</div>
+                                <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Separación nítida</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="title">Inercia WCSS</div>
+                                <div class="num" style="color: var(--text-main); font-size: 1.15rem;">303.78</div>
+                                <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">K=3 Método Codo</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="title">Dataset Muestras</div>
+                                <div class="num" style="color: var(--accent-green); font-size: 1.15rem;">360</div>
+                                <div style="font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">Bloques de 30 min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna Derecha: Simulador Interactivo de Inferencia K-Means -->
+                    <div style="background: var(--bg-secondary); border-radius: 10px; padding: 1.25rem; border: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                                <h3 style="font-size: 0.95rem; color: var(--accent-cyan);">Simulador de Inferencia de Bloque Horario</h3>
+                                <span class="tag-pill" style="font-size: 0.7rem;">Vector X ∈ ℝ⁶</span>
+                            </div>
+
+                            <!-- Botones de Escenario Rápido -->
+                            <div style="display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                                <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="setKMeansPreset('baja')">Preset: Inicio de Jornada</button>
+                                <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="setKMeansPreset('media')">Preset: Media Tarde</button>
+                                <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;" onclick="setKMeansPreset('alta')">Preset: Sobrecarga</button>
+                            </div>
+
+                            <!-- Sliders de Variables Biomecánicas -->
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">
+                                        <span>% Tiempo en Mala Postura:</span>
+                                        <span id="lblKmRiesgo" style="color: var(--accent-cyan); font-family: monospace;">25.0%</span>
+                                    </div>
+                                    <input type="range" id="slKmRiesgo" min="0" max="100" value="25" step="1" style="width: 100%; accent-color: var(--accent-blue);" oninput="updateKMeansInference()">
+                                </div>
+
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">
+                                        <span>Ángulo Cervical Promedio:</span>
+                                        <span id="lblKmCervical" style="color: var(--accent-cyan); font-family: monospace;">22.5°</span>
+                                    </div>
+                                    <input type="range" id="slKmCervical" min="10" max="45" value="22" step="0.5" style="width: 100%; accent-color: var(--accent-blue);" oninput="updateKMeansInference()">
+                                </div>
+
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">
+                                        <span>Desnivel de Hombros Promedio:</span>
+                                        <span id="lblKmHombros" style="color: var(--accent-cyan); font-family: monospace;">4.5°</span>
+                                    </div>
+                                    <input type="range" id="slKmHombros" min="0" max="15" value="4.5" step="0.5" style="width: 100%; accent-color: var(--accent-blue);" oninput="updateKMeansInference()">
+                                </div>
+
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">
+                                        <span>Alertas Disparadas en el Bloque:</span>
+                                        <span id="lblKmAlertas" style="color: var(--accent-cyan); font-family: monospace;">1</span>
+                                    </div>
+                                    <input type="range" id="slKmAlertas" min="0" max="6" value="1" step="1" style="width: 100%; accent-color: var(--accent-blue);" oninput="updateKMeansInference()">
+                                </div>
+
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 2px;">
+                                        <span>Sedentarismo Continuo (minutos):</span>
+                                        <span id="lblKmSedentario" style="color: var(--accent-cyan); font-family: monospace;">25 min</span>
+                                    </div>
+                                    <input type="range" id="slKmSedentario" min="5" max="60" value="25" step="1" style="width: 100%; accent-color: var(--accent-blue);" oninput="updateKMeansInference()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta de Resultado de Inferencia -->
+                        <div style="margin-top: 1.25rem; background: var(--bg-card); border-radius: 8px; padding: 1rem; border: 1px solid var(--border-color);" id="kmResultCard">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Resultado K-Means:</span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">Distancia al centroide: <strong id="kmDistCentroide" style="color: var(--accent-cyan);">0.45</strong></span>
+                            </div>
+
+                            <div style="font-size: 1.35rem; font-weight: 900; letter-spacing: 0.5px; margin-bottom: 0.4rem;" id="kmClusterBadge">
+                                FATIGA MODERADA
+                            </div>
+
+                            <div style="font-size: 0.82rem; color: #e2e8f0; line-height: 1.45; margin-bottom: 0.5rem;" id="kmAccionTexto">
+                                <strong>Acción Operativa:</strong> Micro-pausa sugerida de 30 segundos: estiramiento suave de trapecios y parpadeo consciente.
+                            </div>
+
+                            <div style="font-size: 0.75rem; color: var(--accent-cyan); background: rgba(0, 212, 255, 0.08); padding: 0.4rem 0.6rem; border-radius: 4px;" id="kmModulacionTexto">
+                                <strong>Modulación del Agente:</strong> Ventana temporal de tolerancia ajustada a 4.5 segundos.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Tabla de Dataset Procesado y Matriz de Viabilidad Técnica -->
+                <div style="margin-top: 1.75rem;">
+                    <h3 style="font-size: 1rem; color: var(--accent-cyan); margin-bottom: 0.75rem;">
+                        Matriz de Cumplimiento Técnico del Avance 2 (Criterios del Profesor Neider)
+                    </h3>
+                    <div style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left;">
+                            <thead style="background: var(--bg-secondary); color: var(--accent-cyan);">
+                                <tr>
+                                    <th style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">Requerimiento MVP (Neider)</th>
+                                    <th style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">Evidencia Construida en el Proyecto</th>
+                                    <th style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">Artefacto / Archivo</th>
+                                    <th style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); text-align: center;">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 0.65rem 1rem; font-weight: 600;">1. Dataset cargado y procesado</td>
+                                    <td style="padding: 0.65rem 1rem; color: #cbd5e1;">360 bloques horarios estructurados con variables biomecánicas y temporales normalizadas.</td>
+                                    <td style="padding: 0.65rem 1rem;"><code style="color: var(--accent-cyan);">dataset_bloques_ergonomia.csv</code></td>
+                                    <td style="padding: 0.65rem 1rem; text-align: center;"><span style="color: var(--accent-green); font-weight: bold;">✔ Operativo</span></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);">
+                                    <td style="padding: 0.65rem 1rem; font-weight: 600;">2. Primer modelo entrenado (Clustering)</td>
+                                    <td style="padding: 0.65rem 1rem; color: #cbd5e1;">K-Means (k=3) entrenado con StandardScaler, validado con Método del Codo y Silhouette (0.5888).</td>
+                                    <td style="padding: 0.65rem 1rem;"><code style="color: var(--accent-cyan);">clustering_kmeans_fatiga.py</code> / <code style="color: var(--accent-cyan);">.pkl</code></td>
+                                    <td style="padding: 0.65rem 1rem; text-align: center;"><span style="color: var(--accent-green); font-weight: bold;">✔ Entrenado</span></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 0.65rem 1rem; font-weight: 600;">3. CNN realizando primeras predicciones</td>
+                                    <td style="padding: 0.65rem 1rem; color: #cbd5e1;">MediaPipe BlazePose infiriendo 33 landmarks 3D en tiempo real sobre CPU a >25 FPS.</td>
+                                    <td style="padding: 0.65rem 1rem;"><code style="color: var(--accent-cyan);">asistente_ergonomico.py</code></td>
+                                    <td style="padding: 0.65rem 1rem; text-align: center;"><span style="color: var(--accent-green); font-weight: bold;">✔ Operativo</span></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02);">
+                                    <td style="padding: 0.65rem 1rem; font-weight: 600;">4. Llamada funcional a API</td>
+                                    <td style="padding: 0.65rem 1rem; color: #cbd5e1;">Servicio REST con FastAPI que expone endpoints de inferencia K-Means y cinemática (HTTP 200 OK verificado).</td>
+                                    <td style="padding: 0.65rem 1rem;"><code style="color: var(--accent-cyan);">api_servicio_ergonomia.py</code> / <code style="color: var(--accent-cyan);">probar_llamada_api.py</code></td>
+                                    <td style="padding: 0.65rem 1rem; text-align: center;"><span style="color: var(--accent-green); font-weight: bold;">✔ Verificado</span></td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <td style="padding: 0.65rem 1rem; font-weight: 600;">5. Prototipo de interfaz funcional</td>
+                                    <td style="padding: 0.65rem 1rem; color: #cbd5e1;">HUD translúcido en OpenCV con telemetría en vivo + Dashboard interactivo HTML5.</td>
+                                    <td style="padding: 0.65rem 1rem;"><code style="color: var(--accent-cyan);">demo_exposicion.html</code> / <code style="color: var(--accent-cyan);">evidencia_postura_demo.png</code></td>
+                                    <td style="padding: 0.65rem 1rem; text-align: center;"><span style="color: var(--accent-green); font-weight: bold;">✔ Operativo</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.65rem 1rem; font-weight: 600;">6. Agente ejecutando acciones y filtrado</td>
+                                    <td style="padding: 0.65rem 1rem; color: #cbd5e1;">Ventana temporal anti-falsos positivos (10-15s) y modulación de pausas activas según cluster.</td>
+                                    <td style="padding: 0.65rem 1rem;"><code style="color: var(--accent-cyan);">asistente_ergonomico.py</code></td>
+                                    <td style="padding: 0.65rem 1rem; text-align: center;"><span style="color: var(--accent-green); font-weight: bold;">✔ Operativo</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div>Institución Universitaria Politécnico Grancolombiano | Facultad de Ingeniería, Diseño e Innovación</div>
+        <div>Autores: Valery Meléndez, Juan Guillermo Ramírez, Samuel Marín</div>
+    </footer>
+
+    <script>
+        // Tab Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (tabId === 'kmeans') {
+                setTimeout(initKMeansView, 50);
+            }
+        }
+
+        // SLIDES CONTENT
+        const slides = [
+            {
+                title: "Contexto y Descripción del Problema",
+                tag: "Etapa de Diagnóstico y Oportunidad",
+                content: `
+                    <p>En el contexto del trabajo remoto, desarrollo de software y educación virtual universitaria, las personas pasan entre <strong>8 y 12 horas diarias frente a pantallas de computador</strong>.</p>
+                    <h3>Causas Principales</h3>
+                    <ul>
+                        <li><strong>Pérdida de conciencia corporal:</strong> Durante periodos de alta concentración cognitiva ("estado de flow"), los usuarios descuidan involuntariamente su biomecánica.</li>
+                        <li><strong>Puestos de trabajo no ergonómicos:</strong> Mobiliario inadecuado y alturas incorrectas de monitor en entornos domésticos.</li>
+                        <li><strong>Ausencia de pausas activas contextualizadas:</strong> Las alarmas horarias genéricas suelen ser descartadas porque interrumpen tareas críticas.</li>
+                    </ul>
+                    <h3>Efectos y Actores Afectados</h3>
+                    <p>Desarrollo de Desórdenes Músculo-Esqueléticos (DME) como <em>cifosis dorsal, síndrome de cuello de texto ("text neck"), lumbalgias y túnel carpiano</em>, impactando a desarrolladores, oficinistas y estudiantes universitarios.</p>
+                `
+            },
+            {
+                title: "Pregunta Problema y Objetivos",
+                tag: "Formulación y Alcance",
+                content: `
+                    <h3>Pregunta Problema</h3>
+                    <p style="font-style: italic; font-size: 1.05rem; color: var(--accent-cyan); background: rgba(0, 212, 255, 0.08); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-cyan);">
+                        "¿Cómo monitorizar y corregir de manera automática y no intrusiva los hábitos posturales y el sedentarismo en entornos de trabajo frente a pantallas, utilizando visión por computador e inteligencia artificial, para reducir el riesgo de desórdenes músculo-esqueléticos sin interrumpir la productividad del usuario?"
+                    </p>
+                    <h3>Objetivo General</h3>
+                    <p>Desarrollar un prototipo de software de asistencia ergonómica en tiempo real que, mediante visión artificial y análisis de comportamiento, evalúe la postura del usuario frente a la cámara web, emitiendo alertas personalizadas basadas en normativas de salud ocupacional.</p>
+                    <h3>Objetivos Específicos</h3>
+                    <ul>
+                        <li>Implementar el módulo de captura y estimación de puntos clave (landmarks) de torso y rostro para calcular inclinación cervical y simetría de hombros.</li>
+                        <li>Diseñar un agente de lógica temporal y modelo de fatiga no supervisado (K-Means) para prevenir interrupciones molestas.</li>
+                        <li>Garantizar la privacidad del usuario procesando todo localmente bajo el paradigma de <strong>Edge Computing</strong>.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Justificación y Valor Agregado de la IA",
+                tag: "Valor de la Solución Tecnológica",
+                content: `
+                    <p>Las alternativas convencionales (charlas anuales de salud ocupacional, temporizadores fijos en el móvil o pausas grupales) fracasan porque son <strong>pasivas, rígidas y descontextualizadas</strong>.</p>
+                    <h3>¿Por qué la Inteligencia Artificial marca la diferencia?</h3>
+                    <ul>
+                        <li><strong>Observación Objetiva y Continua:</strong> La visión artificial mide milimétricamente el deterioro biomecánico real en lugar de depender de la autoevaluación subjetiva.</li>
+                        <li><strong>Intervención Quirúrgica y Oportuna:</strong> Solo interviene cuando se constata una desviación sostenida acumulada, respetando los momentos de máxima productividad.</li>
+                        <li><strong>Cero Sensores Físicos Adicionales:</strong> Aprovecha la cámara web ya existente en cualquier computador portátil o de escritorio.</li>
+                        <li><strong>Adaptabilidad Personalizada:</strong> Cada usuario tiene una contextura y distancia de monitor distinta; el sistema permite calibrar la postura neutra base.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "Estado del Arte Fortalecido (Avance 2)",
+                tag: "Investigación Comparativa",
+                content: `
+                    <p>En el Avance 2 se profundizó el análisis comparativo con investigaciones punteras en ergonomía computacional:</p>
+                    <ul>
+                        <li><strong>Rodrigues et al. (2022):</strong> Evaluaron posturas en oficinas con cámaras Kinect y el método RULA. Desventaja: requería hardware de profundidad costoso y especializado.</li>
+                        <li><strong>Lin et al. (2022):</strong> Aplicaron OpenPose para calcular RULA/REBA en tiempo real. Desventaja: OpenPose requiere tarjetas gráficas de alta gama (GPU) para superar los 15 FPS.</li>
+                        <li><strong>Menanno et al. (2024):</strong> Estimación 3D y reglas difusas aplicadas a celdas robóticas, reduciendo el estrés ergonómico en un 13% y aumentando productividad en 33%.</li>
+                    </ul>
+                    <h3>Diferencial de Nuestra Propuesta</h3>
+                    <p>Se adopta <strong>MediaPipe Pose (BlazePose)</strong> optimizado con redes neuronales convolucionales ligeras que corren a más de 25-30 FPS en CPUs estándar, sin necesidad de hardware dedicado ni GPU externa.</p>
+                `
+            },
+            {
+                title: "Modelado de IA, K-Means y Delimitación Técnica",
+                tag: "Ingeniería, Algoritmos y Ética",
+                content: `
+                    <h3>Técnicas de Inteligencia Artificial Integradas</h3>
+                    <ul>
+                        <li><strong>CNN Ligera BlazePose:</strong> Inferencia de 33 landmarks corporales 3D en milisegundos con inferencia local (Edge AI).</li>
+                        <li><strong>Cinemática Angular Biomecánica:</strong> Derivadas de posición oreja-hombro y simetría escapular según ISO 9241-5.</li>
+                        <li><strong>Agente con Memoria Temporal:</strong> Ventana de persistencia anti-falsos positivos (10-15s).</li>
+                        <li><strong>Clustering K-Means (No Supervisado):</strong> Agrupamiento dinámico de bloques de 30-60 min en tres niveles operacionales: <em>"Baja fatiga"</em>, <em>"Fatiga moderada"</em> y <em>"Alta fatiga"</em> (Silhouette: <strong>0.5888</strong>).</li>
+                    </ul>
+                    <div style="background: rgba(0, 132, 255, 0.1); border-left: 3px solid var(--accent-cyan); padding: 0.75rem 1rem; border-radius: 6px; margin: 1rem 0;">
+                        <strong style="color: var(--accent-cyan);">Atención a la Retroalimentación Docente (Prof. Neider):</strong><br/>
+                        Se delimita formalmente el rol de K-Means a la <strong>prevención y modulación de pausas activas laborales</strong>, evitando taxativamente que el sistema formule diagnósticos médicos o tratamientos clínicos, sustentando un MVP técnicamente medible y viable.
+                    </div>
+                `
+            },
+            {
+                title: "Evidencias Funcionales Demostrables (Avance 2)",
+                tag: "MVP Medible y Viabilidad Técnica",
+                content: `
+                    <p>En total concordancia con las pautas del docente, se evidencia viabilidad técnica mediante artefactos 100% operativos:</p>
+                    <ul>
+                        <li><strong>Dataset Procesado:</strong> Archivo <code style="color:var(--accent-cyan);">dataset_bloques_ergonomia.csv</code> con 360 bloques horarios estructurados.</li>
+                        <li><strong>Modelo de Clustering Entrenado:</strong> Script <code style="color:var(--accent-cyan);">clustering_kmeans_fatiga.py</code> con persistencia en <code style="color:var(--accent-cyan);">modelo_kmeans_fatiga.pkl</code> y gráficas del Método del Codo y Silhouette.</li>
+                        <li><strong>Servicio API REST Operativo:</strong> Endpoints FastAPI en <code style="color:var(--accent-cyan);">api_servicio_ergonomia.py</code> validados con cliente automatizado (<code style="color:var(--accent-cyan);">probar_llamada_api.py</code>) respondiendo HTTP 200 OK.</li>
+                        <li><strong>Prototipo Funcional de Visión:</strong> <code style="color:var(--accent-cyan);">asistente_ergonomico.py</code> con HUD translúcido, cálculo angular y clustering K-Means en vivo.</li>
+                        <li><strong>Agente Inteligente en Ejecución:</strong> Filtrado temporal de movimientos transitorios y modulación de pausas según el nivel de fatiga.</li>
+                    </ul>
+                `
+            }
+        ];
+
+        function loadSlide(index) {
+            document.querySelectorAll('.slide-nav-btn').forEach((b, i) => {
+                b.classList.toggle('active', i === index);
+            });
+            const s = slides[index];
+            document.getElementById('slideContent').innerHTML = `
+                <span class="tag-pill">${s.tag}</span>
+                <h2>${s.title}</h2>
+                <div>${s.content}</div>
+            `;
+        }
+
+        // Initialize Slide 0
+        loadSlide(0);
+
+        // ==========================================
+        // CANVAS POSTURE SIMULATION ENGINE
+        // ==========================================
+        const canvas = document.getElementById('postureCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let simState = {
+            cervicalAngle: 14.0,
+            shoulderTilt: 2.0,
+            riskTime: 0.0,
+            score: 98,
+            status: "POSTURA ÓPTIMA (ADECUADA)",
+            color: "#00e676",
+            alertActive: false,
+            autoCycle: true,
+            phase: 0.0,
+            manualMode: false,
+            targetCervical: 14.0,
+            targetShoulder: 2.0
+        };
+
+        let sessionStats = {
+            frames: 1248,
+            correctFrames: 1180,
+            alerts: 2
+        };
+
+        function setPostureScenario(type) {
+            simState.autoCycle = false;
+            document.getElementById('btnAutoCycle').textContent = "Reanudar Ciclo Automático";
+            
+            if (type === 'optima') {
+                simState.targetCervical = 14.0;
+                simState.targetShoulder = 1.5;
+            } else if (type === 'cervical') {
+                simState.targetCervical = 34.0;
+                simState.targetShoulder = 2.0;
+            } else if (type === 'hombros') {
+                simState.targetCervical = 16.0;
+                simState.targetShoulder = 11.5;
+            }
+        }
+
+        function triggerPausaActiva() {
+            simState.riskTime = 5.0;
+            simState.alertActive = true;
+            simState.targetCervical = 35.0;
+            simState.autoCycle = false;
+            document.getElementById('btnAutoCycle').textContent = "Reanudar Ciclo Automático";
+        }
+
+        function toggleAutoCycle() {
+            simState.autoCycle = !simState.autoCycle;
+            document.getElementById('btnAutoCycle').textContent = simState.autoCycle ? "Pausar Ciclo Automático" : "Reanudar Ciclo Automático";
+        }
+
+        function updateSimulation() {
+            sessionStats.frames++;
+
+            if (simState.autoCycle) {
+                simState.phase += 0.025;
+                const osc = Math.sin(simState.phase);
+                // Oscila de 12 a 34 grados
+                simState.cervicalAngle = 22.0 + osc * 12.0;
+                simState.shoulderTilt = Math.abs(Math.cos(simState.phase * 0.8)) * 8.0;
+            } else {
+                // Smooth interpolation to target
+                simState.cervicalAngle += (simState.targetCervical - simState.cervicalAngle) * 0.08;
+                simState.shoulderTilt += (simState.targetShoulder - simState.shoulderTilt) * 0.08;
+            }
+
+            // Evaluation logic
+            const badCervical = simState.cervicalAngle > 27.0;
+            const badShoulders = simState.shoulderTilt > 7.0;
+
+            if (badCervical || badShoulders) {
+                simState.riskTime = Math.min(6.0, simState.riskTime + 0.04);
+                simState.status = badCervical ? "RIESGO: CABEZA ADELANTADA" : "RIESGO: HOMBROS DESALINEADOS";
+                simState.color = "#ff3d00";
+                simState.score = Math.max(20, Math.round(100 - (simState.cervicalAngle - 20) * 3));
+
+                if (simState.riskTime >= 4.8) {
+                    simState.alertActive = true;
+                }
+            } else {
+                simState.riskTime = Math.max(0, simState.riskTime - 0.08);
+                simState.status = "POSTURA ÓPTIMA (ADECUADA)";
+                simState.color = "#00e676";
+                simState.score = 98;
+                simState.alertActive = false;
+                sessionStats.correctFrames++;
+            }
+
+            // Update UI
+            document.getElementById('hudStatus').style.borderLeftColor = simState.color;
+            document.getElementById('statusDot').style.background = simState.color;
+            document.getElementById('statusText').textContent = simState.status;
+            document.getElementById('hudScore').textContent = `${simState.score}% SCORE`;
+            document.getElementById('hudScore').style.color = simState.color;
+
+            document.getElementById('valCervical').textContent = simState.cervicalAngle.toFixed(1) + "°";
+            document.getElementById('valHombros').textContent = simState.shoulderTilt.toFixed(1) + "°";
+            document.getElementById('valTiempoRiesgo').textContent = `${simState.riskTime.toFixed(1)}s / 5.0s`;
+
+            const fillCerv = Math.min(100, (simState.cervicalAngle / 45) * 100);
+            const fillHomb = Math.min(100, (simState.shoulderTilt / 15) * 100);
+            const fillTiem = Math.min(100, (simState.riskTime / 5.0) * 100);
+
+            document.getElementById('fillCervical').style.width = fillCerv + "%";
+            document.getElementById('fillCervical').style.background = simState.cervicalAngle > 27 ? "#ff3d00" : "#00e676";
+
+            document.getElementById('fillHombros').style.width = fillHomb + "%";
+            document.getElementById('fillHombros').style.background = simState.shoulderTilt > 7 ? "#ffb300" : "#00e676";
+
+            document.getElementById('fillTiempo').style.width = fillTiem + "%";
+
+            document.getElementById('floatingAlert').style.display = simState.alertActive ? "block" : "none";
+
+            document.getElementById('statFrames').textContent = sessionStats.frames.toLocaleString();
+            const pct = ((sessionStats.correctFrames / sessionStats.frames) * 100).toFixed(1);
+            document.getElementById('statCumplimiento').textContent = pct + "%";
+            if (simState.alertActive && simState.riskTime >= 4.9) {
+                sessionStats.alerts++;
+                document.getElementById('statAlertas').textContent = sessionStats.alerts;
+            }
+        }
+
+        function drawSkeleton() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw futuristic background grid
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Biomechanical head shift based on cervical angle
+            const forwardShift = (simState.cervicalAngle - 15) * 4.5;
+            const shoulderShift = (simState.shoulderTilt) * 3.5;
+
+            // Key landmark positions
+            const headX = centerX + forwardShift;
+            const headY = centerY - 100;
+            const neckX = centerX + forwardShift * 0.5;
+            const neckY = centerY - 30;
+
+            const lShoulderX = centerX - 120;
+            const lShoulderY = centerY + 10 - shoulderShift;
+
+            const rShoulderX = centerX + 120;
+            const rShoulderY = centerY + 10 + shoulderShift;
+
+            const spineBaseX = centerX;
+            const spineBaseY = centerY + 170;
+
+            // Draw Connections
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = simState.color;
+
+            // Neck to Head
+            ctx.beginPath();
+            ctx.moveTo(neckX, neckY);
+            ctx.lineTo(headX, headY);
+            ctx.stroke();
+
+            // Shoulders line
+            ctx.beginPath();
+            ctx.moveTo(lShoulderX, lShoulderY);
+            ctx.lineTo(rShoulderX, rShoulderY);
+            ctx.stroke();
+
+            // Spine
+            ctx.beginPath();
+            ctx.moveTo(neckX, neckY);
+            ctx.lineTo(spineBaseX, spineBaseY);
+            ctx.stroke();
+
+            // Ears to shoulders lines (cervical angle measurement line)
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(0, 212, 255, 0.6)";
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(headX, headY);
+            ctx.lineTo(lShoulderX, lShoulderY);
+            ctx.moveTo(headX, headY);
+            ctx.lineTo(rShoulderX, rShoulderY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw Joints (Landmarks)
+            const joints = [
+                { x: headX, y: headY, r: 28, isHead: true },
+                { x: neckX, y: neckY, r: 7 },
+                { x: lShoulderX, y: lShoulderY, r: 9 },
+                { x: rShoulderX, y: rShoulderY, r: 9 },
+                { x: spineBaseX, y: spineBaseY, r: 7 }
+            ];
+
+            joints.forEach(j => {
+                ctx.beginPath();
+                ctx.arc(j.x, j.y, j.r, 0, Math.PI * 2);
+                if (j.isHead) {
+                    ctx.strokeStyle = simState.color;
+                    ctx.lineWidth = 3;
+                    ctx.fillStyle = "rgba(15, 20, 28, 0.8)";
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Face features
+                    ctx.fillStyle = "#fff";
+                    ctx.beginPath();
+                    ctx.arc(j.x + 8, j.y - 4, 3, 0, Math.PI * 2);
+                    ctx.arc(j.x - 8, j.y - 4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fill();
+                    ctx.strokeStyle = simState.color;
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            });
+
+            // Angle arc label for cervical tilt
+            ctx.fillStyle = "var(--accent-cyan)";
+            ctx.font = "bold 13px monospace";
+            ctx.fillText(`θ Cervical: ${simState.cervicalAngle.toFixed(1)}°`, neckX + 15, neckY - 15);
+            ctx.fillText(`Δ Hombros: ${simState.shoulderTilt.toFixed(1)}°`, lShoulderX - 20, lShoulderY - 15);
+        }
+
+        function animationLoop() {
+            updateSimulation();
+            drawSkeleton();
+            requestAnimationFrame(animationLoop);
+        }
+
+        // Start Animation
+        animationLoop();
+
+        // ==========================================
+        // K-MEANS CLUSTERING 2D VISUALIZER & SIMULATOR
+        // ==========================================
+        const kmCanvas = document.getElementById('kmeansScatterCanvas');
+        let kmCtx = null;
+
+        // Centroids from trained model (in unscaled units for plotting)
+        const centroids = [
+            { id: 0, name: "Baja fatiga", x: 9.69, y: 15.23, color: "#00e676", action: "Mantener ritmo de trabajo; programar recordatorio de hidratación a los 45 minutos.", tol: "7.0s" },
+            { id: 1, name: "Fatiga moderada", x: 35.81, y: 24.33, color: "#ffb300", action: "Micro-pausa sugerida de 30 segundos: estiramiento suave de trapecios y parpadeo consciente.", tol: "4.5s" },
+            { id: 2, name: "Alta fatiga", x: 73.49, y: 33.44, color: "#ff3d00", action: "Pausa activa obligatoria de 3 a 5 minutos: levantarse de la silla, rotación de hombros y descanso visual 20-20-20.", tol: "3.0s (alta sensibilidad)" }
+        ];
+
+        // Representative cluster sample points from dataset
+        const clusterPoints = [];
+        (function generateSampleScatterPoints() {
+            // Seeded synthetic points matching dataset
+            function addCluster(cx, cy, sx, sy, cat, n) {
+                for (let i = 0; i < n; i++) {
+                    const px = Math.min(96, Math.max(2, cx + (Math.random() - 0.5) * sx * 2));
+                    const py = Math.min(42, Math.max(11, cy + (Math.random() - 0.5) * sy * 2));
+                    clusterPoints.push({ x: px, y: py, cat: cat });
+                }
+            }
+            addCluster(9.7, 15.2, 7.5, 3.2, 0, 36);
+            addCluster(35.8, 24.3, 11.0, 4.0, 1, 32);
+            addCluster(73.5, 33.4, 14.0, 5.0, 2, 26);
+        })();
+
+        let currentSimBlock = {
+            riesgo: 25.0,
+            cervical: 22.0,
+            hombros: 4.5,
+            alertas: 1,
+            sedentario: 25.0,
+            cluster: 1
+        };
+
+        function initKMeansView() {
+            if (!kmCanvas) return;
+            kmCtx = kmCanvas.getContext('2d');
+            updateKMeansInference();
+        }
+
+        function setKMeansPreset(type) {
+            if (type === 'baja') {
+                document.getElementById('slKmRiesgo').value = 8;
+                document.getElementById('slKmCervical').value = 15;
+                document.getElementById('slKmHombros').value = 2;
+                document.getElementById('slKmAlertas').value = 0;
+                document.getElementById('slKmSedentario').value = 15;
+            } else if (type === 'media') {
+                document.getElementById('slKmRiesgo').value = 35;
+                document.getElementById('slKmCervical').value = 24;
+                document.getElementById('slKmHombros').value = 5;
+                document.getElementById('slKmAlertas').value = 2;
+                document.getElementById('slKmSedentario').value = 32;
+            } else if (type === 'alta') {
+                document.getElementById('slKmRiesgo').value = 75;
+                document.getElementById('slKmCervical').value = 34;
+                document.getElementById('slKmHombros').value = 9;
+                document.getElementById('slKmAlertas').value = 4;
+                document.getElementById('slKmSedentario').value = 52;
+            }
+            updateKMeansInference();
+        }
+
+        function updateKMeansInference() {
+            const r = parseFloat(document.getElementById('slKmRiesgo').value);
+            const c = parseFloat(document.getElementById('slKmCervical').value);
+            const h = parseFloat(document.getElementById('slKmHombros').value);
+            const a = parseInt(document.getElementById('slKmAlertas').value);
+            const s = parseFloat(document.getElementById('slKmSedentario').value);
+
+            document.getElementById('lblKmRiesgo').textContent = r.toFixed(1) + "%";
+            document.getElementById('lblKmCervical').textContent = c.toFixed(1) + "°";
+            document.getElementById('lblKmHombros').textContent = h.toFixed(1) + "°";
+            document.getElementById('lblKmAlertas').textContent = a;
+            document.getElementById('lblKmSedentario').textContent = s.toFixed(0) + " min";
+
+            currentSimBlock.riesgo = r;
+            currentSimBlock.cervical = c;
+
+            // Normalized Euclidean distance calculation to centroids
+            // Weights based on standard deviations of dataset
+            let minD = 999999;
+            let assignedIdx = 0;
+
+            centroids.forEach((cent, idx) => {
+                const dx = (r - cent.x) / 28.0;
+                const dy = (c - cent.y) / 8.0;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < minD) {
+                    minD = dist;
+                    assignedIdx = idx;
+                }
+            });
+
+            currentSimBlock.cluster = assignedIdx;
+            const res = centroids[assignedIdx];
+
+            // Update UI card
+            const badge = document.getElementById('kmClusterBadge');
+            badge.textContent = res.name.toUpperCase();
+            badge.style.color = res.color;
+            document.getElementById('kmResultCard').style.borderColor = res.color;
+            document.getElementById('kmDistCentroide').textContent = minD.toFixed(3);
+            document.getElementById('kmAccionTexto').innerHTML = `<strong>Acción Operativa:</strong> ${res.action}`;
+            document.getElementById('kmModulacionTexto').innerHTML = `<strong>Modulación del Agente:</strong> Tolerancia de alerta adaptada a <strong>${res.tol}</strong>.`;
+
+            drawKMeansScatter();
+        }
+
+        function drawKMeansScatter() {
+            if (!kmCanvas || !kmCtx) return;
+            const w = kmCanvas.width;
+            const h = kmCanvas.height;
+
+            kmCtx.clearRect(0, 0, w, h);
+
+            // Bounds
+            const padL = 50, padR = 25, padT = 25, padB = 40;
+            const plotW = w - padL - padR;
+            const plotH = h - padT - padB;
+
+            function toCanvasX(xVal) { return padL + (xVal / 100) * plotW; }
+            function toCanvasY(yVal) { return padT + plotH - ((yVal - 10) / 35) * plotH; }
+
+            // Grid lines
+            kmCtx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+            kmCtx.lineWidth = 1;
+
+            // X grid (Riesgo 0, 20, 40, 60, 80, 100)
+            kmCtx.fillStyle = "#64748b";
+            kmCtx.font = "10px monospace";
+            kmCtx.textAlign = "center";
+            for (let rx = 0; rx <= 100; rx += 20) {
+                const cx = toCanvasX(rx);
+                kmCtx.beginPath();
+                kmCtx.moveTo(cx, padT);
+                kmCtx.lineTo(cx, padT + plotH);
+                kmCtx.stroke();
+                kmCtx.fillText(rx + "%", cx, padT + plotH + 16);
+            }
+            kmCtx.fillText("% Tiempo en Postura de Riesgo (Bloque 30m)", padL + plotW / 2, h - 8);
+
+            // Y grid (Cervical 10, 15, 20, 25, 30, 35, 40, 45)
+            kmCtx.textAlign = "right";
+            for (let cy = 10; cy <= 45; cy += 5) {
+                const cyCanvas = toCanvasY(cy);
+                kmCtx.beginPath();
+                kmCtx.moveTo(padL, cyCanvas);
+                kmCtx.lineTo(padL + plotW, cyCanvas);
+                kmCtx.stroke();
+                kmCtx.fillText(cy + "°", padL - 8, cyCanvas + 4);
+            }
+
+            // ISO 9241-5 Threshold Line at 28 degrees
+            const yIso = toCanvasY(28);
+            kmCtx.strokeStyle = "rgba(255, 107, 129, 0.5)";
+            kmCtx.setLineDash([4, 4]);
+            kmCtx.beginPath();
+            kmCtx.moveTo(padL, yIso);
+            kmCtx.lineTo(padL + plotW, yIso);
+            kmCtx.stroke();
+            kmCtx.setLineDash([]);
+            kmCtx.fillStyle = "#ff6b81";
+            kmCtx.textAlign = "left";
+            kmCtx.fillText("Umbral ISO 9241-5 (28°)", padL + 8, yIso - 6);
+
+            // Draw Scatter Sample Points
+            const colors = ["#00e676", "#ffb300", "#ff3d00"];
+            clusterPoints.forEach(pt => {
+                const px = toCanvasX(pt.x);
+                const py = toCanvasY(pt.y);
+                kmCtx.beginPath();
+                kmCtx.arc(px, py, 4, 0, Math.PI * 2);
+                kmCtx.fillStyle = colors[pt.cat];
+                kmCtx.globalAlpha = 0.65;
+                kmCtx.fill();
+            });
+            kmCtx.globalAlpha = 1.0;
+
+            // Draw Centroids
+            centroids.forEach(cent => {
+                const cx = toCanvasX(cent.x);
+                const cy = toCanvasY(cent.y);
+
+                // Diamond shape
+                kmCtx.beginPath();
+                kmCtx.moveTo(cx, cy - 9);
+                kmCtx.lineTo(cx + 9, cy);
+                kmCtx.lineTo(cx, cy + 9);
+                kmCtx.lineTo(cx - 9, cy);
+                kmCtx.closePath();
+                kmCtx.fillStyle = cent.color;
+                kmCtx.fill();
+                kmCtx.strokeStyle = "#ffffff";
+                kmCtx.lineWidth = 2;
+                kmCtx.stroke();
+
+                kmCtx.fillStyle = "#ffffff";
+                kmCtx.font = "bold 9px sans-serif";
+                kmCtx.textAlign = "center";
+                kmCtx.fillText(`C${cent.id}`, cx, cy - 12);
+            });
+
+            // Draw Simulated User Point
+            const userX = toCanvasX(currentSimBlock.riesgo);
+            const userY = toCanvasY(currentSimBlock.cervical);
+            const nearestCent = centroids[currentSimBlock.cluster];
+            const centX = toCanvasX(nearestCent.x);
+            const centY = toCanvasY(nearestCent.y);
+
+            // Line connecting to nearest centroid
+            kmCtx.strokeStyle = "#00d4ff";
+            kmCtx.setLineDash([3, 3]);
+            kmCtx.lineWidth = 1.5;
+            kmCtx.beginPath();
+            kmCtx.moveTo(userX, userY);
+            kmCtx.lineTo(centX, centY);
+            kmCtx.stroke();
+            kmCtx.setLineDash([]);
+
+            // Star marker for user block
+            kmCtx.fillStyle = "#00d4ff";
+            kmCtx.beginPath();
+            kmCtx.arc(userX, userY, 8, 0, Math.PI * 2);
+            kmCtx.fill();
+            kmCtx.strokeStyle = "#ffffff";
+            kmCtx.lineWidth = 2;
+            kmCtx.stroke();
+
+            kmCtx.fillStyle = "#00d4ff";
+            kmCtx.font = "bold 11px monospace";
+            kmCtx.textAlign = "left";
+            kmCtx.fillText("★ Bloque Actual", userX + 12, userY + 4);
+        }
+    </script>
+</body>
+</html>

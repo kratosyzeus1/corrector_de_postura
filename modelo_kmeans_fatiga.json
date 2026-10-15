@@ -1,0 +1,48 @@
+{
+  "algoritmo": "K-Means (Clustering No Supervisado)",
+  "k_clusters": 3,
+  "metricas_evaluacion": {
+    "silhouette_score_promedio": 0.5888,
+    "inercia_final_wcss": 303.78
+  },
+  "variables_modelo": [
+    "tiempo_riesgo_pct",
+    "angulo_cervical_promedio",
+    "asimetria_hombros_promedio",
+    "alertas_disparadas",
+    "tiempo_sedentario_continuo_min",
+    "score_ergonomico_medio"
+  ],
+  "perfiles_clusters": {
+    "Baja fatiga": {
+      "tamano_muestra": 144,
+      "porcentaje": 40.0,
+      "score_medio": 93.34,
+      "cervical_media_deg": 15.23,
+      "tiempo_riesgo_pct_medio": 9.69,
+      "alertas_medias": 0.12,
+      "sedentario_min_medio": 16.91,
+      "accion_recomendada": "Mantener ritmo de trabajo; programar recordatorio de hidratación a los 45 minutos."
+    },
+    "Fatiga moderada": {
+      "tamano_muestra": 125,
+      "porcentaje": 34.7,
+      "score_medio": 68.97,
+      "cervical_media_deg": 24.33,
+      "tiempo_riesgo_pct_medio": 35.81,
+      "alertas_medias": 1.7,
+      "sedentario_min_medio": 33.12,
+      "accion_recomendada": "Micro-pausa sugerida de 30 segundos: estiramiento suave de trapecios y parpadeo consciente."
+    },
+    "Alta fatiga": {
+      "tamano_muestra": 91,
+      "porcentaje": 25.3,
+      "score_medio": 31.68,
+      "cervical_media_deg": 33.44,
+      "tiempo_riesgo_pct_medio": 73.49,
+      "alertas_medias": 4.07,
+      "sedentario_min_medio": 50.04,
+      "accion_recomendada": "Pausa activa obligatoria de 3 a 5 minutos: levantarse de la silla, rotación de hombros y descanso visual 20-20-20."
+    }
+  }
+}
