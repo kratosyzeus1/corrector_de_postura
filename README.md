@@ -39,11 +39,11 @@ El sistema utiliza la cámara web convencional del usuario para monitorizar en t
 ## 📂 Estructura del Repositorio
 
 ```text
-├── asistente_ergonomico.py         # Módulo principal: visión BlazePose, 2 vistas (Compacta/Overlay) y K-Means
+├── asistente_ergonomico.py         # Módulo principal: visión BlazePose (Frontal/Perfil), 2 vistas y K-Means
 ├── gestor_camara.py                # Detección multi-cámara y manejo anti-conflicto con videollamadas (Windows)
 ├── interfaz_overlay.py             # Selector inicial multi-cámara + Vista 2 transparente de solo notificaciones
 ├── monitor_recursos.py             # Monitor nativo en tiempo real de RAM (Working Set/Privada/Pico) y CPU
-├── validar_sistema.py              # Script de validación integral (multi-cámara, conflictos y benchmark RAM)
+├── validar_sistema.py              # Script de validación integral (multi-cámara, conflictos, RAM y frontal/perfil)
 ├── .py                             # Wrapper de ejecución rápida del asistente
 ├── clustering_kmeans_fatiga.py     # Script de entrenamiento, evaluación del codo y métricas de K-Means
 ├── dataset_bloques_ergonomia.csv   # Dataset estructurado de 360 bloques horarios de sesiones
@@ -51,12 +51,6 @@ El sistema utiliza la cámara web convencional del usuario para monitorizar en t
 ├── modelo_kmeans_fatiga.json       # Metadatos, centroides e interpretabilidad de clusters
 ├── api_servicio_ergonomia.py       # API REST con FastAPI para inferencia de fatiga y postura
 ├── probar_llamada_api.py           # Cliente de prueba automatizado de la API REST (HTTP 200 OK)
-├── demo_exposicion.html            # Dashboard web interactivo con simulador y diapositivas
-├── DOCUMENTO_ENTREGA_AVANCE_2.md   # Documento académico formal de la entrega (Avance 2)
-├── evidencia_postura_demo.png      # Captura de pantalla funcional del HUD en ejecución
-├── evidencia_metodo_codo_kmeans.png# Gráfica del método del codo (WCSS)
-├── evidencia_clusters_fatiga_2d.png# Mapa de dispersión 2D de clusters de fatiga
-├── evidencia_silhouette_kmeans.png # Gráfica de distribución del Coeficiente de Silhouette
 ├── .gitignore                      # Exclusiones de Git (caché, entornos virtuales)
 └── README.md                       # Documentación del repositorio
 ```
@@ -95,7 +89,7 @@ python asistente_ergonomico.py --vista compacta --demo
 - `[T]` o `[TAB]`: Alternar a Vista 2 (Overlay / Segundo plano).
 - `[V]`: Cambiar a la siguiente cámara disponible en caliente.
 - `[P]`: Pausar y liberar manualmente la cámara (o reanudar).
-- `[F]`: Alternar fondo entre Avatar sin espejo (defecto) y Cámara con desenfoque de privacidad.
+- `[F]`: Alternar fondo entre Cámara en vivo (defecto) y Avatar sin espejo.
 - `[C]`: Calibrar postura neutra de referencia actual.
 - `[M]`: Alternar entre Cámara Web en vivo y Modo Demostración Sintético.
 - `[K]`: Ejecutar inferencia K-Means sobre la telemetría acumulada.
@@ -117,9 +111,6 @@ python probar_llamada_api.py
 ```bash
 python clustering_kmeans_fatiga.py
 ```
-
-### 7. Abrir el Dashboard Interactivo de Exposición
-Abre el archivo `demo_exposicion.html` directamente en cualquier navegador web (Google Chrome, Edge, Firefox).
 
 ---
 
