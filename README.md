@@ -39,7 +39,11 @@ El sistema utiliza la cámara web convencional del usuario para monitorizar en t
 ## 📂 Estructura del Repositorio
 
 ```text
-├── asistente_ergonomico.py         # Módulo principal de visión por computador y HUD en tiempo real
+├── asistente_ergonomico.py         # Módulo principal: visión BlazePose, 2 vistas (Compacta/Overlay) y K-Means
+├── gestor_camara.py                # Detección multi-cámara y manejo anti-conflicto con videollamadas (Windows)
+├── interfaz_overlay.py             # Selector inicial multi-cámara + Vista 2 transparente de solo notificaciones
+├── monitor_recursos.py             # Monitor nativo en tiempo real de RAM (Working Set/Privada/Pico) y CPU
+├── validar_sistema.py              # Script de validación integral (multi-cámara, conflictos y benchmark RAM)
 ├── .py                             # Wrapper de ejecución rápida del asistente
 ├── clustering_kmeans_fatiga.py     # Script de entrenamiento, evaluación del codo y métricas de K-Means
 ├── dataset_bloques_ergonomia.csv   # Dataset estructurado de 360 bloques horarios de sesiones
@@ -72,28 +76,49 @@ cd "Tarea uni"
 pip install opencv-python mediapipe numpy scikit-learn pandas matplotlib fastapi uvicorn httpx
 ```
 
-### 3. Ejecutar el Asistente en Tiempo Real (Webcam / Demostración)
+### 3. Ejecutar el Asistente en Tiempo Real (Multi-Cámara / 2 Vistas / Anti-Conflicto)
 ```bash
 python asistente_ergonomico.py
 ```
-**Controles del Teclado:**
+Al iniciar, se abre un selector compacto para elegir la cámara (cuando hay más de una), la vista inicial y la protección de videollamadas. También acepta opciones por línea de comandos:
+```bash
+python asistente_ergonomico.py --listar-camaras
+python asistente_ergonomico.py --camara 1 --vista overlay
+python asistente_ergonomico.py --vista compacta --demo
+```
+
+**Dos Vistas No Disruptivas:**
+- **Vista 2 (`overlay` — Recomendada):** Ejecución en segundo plano sobre la pantalla normal del usuario (sin verse en cámara). Solo muestra una mini-píldora flotante semitransparente y notificaciones discretas tipo *Toast* cuando se requiere corregir la postura o cuando se cede la cámara a una videollamada.
+- **Vista 1 (`compacta`):** Muestra la imagen en vivo de la cámara con esqueleto ergonómico ligero, paneles compactos, mensajes/notificaciones pequeños (con doble buffer y suavizado anti-parpadeo) y lectura en vivo de RAM. Con `[F]` también puede alternarse a modo solo avatar.
+
+**Controles del Teclado (en Vista 1):**
+- `[T]` o `[TAB]`: Alternar a Vista 2 (Overlay / Segundo plano).
+- `[V]`: Cambiar a la siguiente cámara disponible en caliente.
+- `[P]`: Pausar y liberar manualmente la cámara (o reanudar).
+- `[F]`: Alternar fondo entre Avatar sin espejo (defecto) y Cámara con desenfoque de privacidad.
 - `[C]`: Calibrar postura neutra de referencia actual.
 - `[M]`: Alternar entre Cámara Web en vivo y Modo Demostración Sintético.
 - `[K]`: Ejecutar inferencia K-Means sobre la telemetría acumulada.
 - `[S]`: Guardar captura de pantalla de evidencia.
-- `[Q]`: Finalizar ejecución y ver estadísticas de la sesión.
+- `[Q]`: Finalizar ejecución y ver resumen de sesión (incluye métricas de RAM y conflictos).
 
-### 4. Probar el Servicio API REST
+### 4. Validar Multi-Cámara, Conflictos de Videollamada y Consumo de RAM
+```bash
+python validar_sistema.py
+```
+Ejecuta las pruebas automatizadas de los 4 ajustes solicitados, exporta `reporte_validacion_recursos.json` y genera la gráfica `evidencia_consumo_ram.png`.
+
+### 5. Probar el Servicio API REST
 ```bash
 python probar_llamada_api.py
 ```
 
-### 5. Reentrenar el Modelo K-Means
+### 6. Reentrenar el Modelo K-Means
 ```bash
 python clustering_kmeans_fatiga.py
 ```
 
-### 6. Abrir el Dashboard Interactivo de Exposición
+### 7. Abrir el Dashboard Interactivo de Exposición
 Abre el archivo `demo_exposicion.html` directamente en cualquier navegador web (Google Chrome, Edge, Firefox).
 
 ---
