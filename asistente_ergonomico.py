@@ -155,7 +155,7 @@ class AsistenteErgonomico:
             self.accion_ergonomica = "Micro-pausa de 30s sugerida: estiramiento de trapecios."
         else:
             self.cluster_color = (0, 60, 255) # Rojo
-            self.TIEMPO_ALERTA_SEGUNDOS = 3.0
+            self.TIEMPO_ALERTA_SEGUNDOS = 10.0
             self.accion_ergonomica = "Pausa activa obligatoria de 3-5 min: levantarse y descanso visual 20-20-20."
 
     def calcular_angulo(self, p1, p2):
